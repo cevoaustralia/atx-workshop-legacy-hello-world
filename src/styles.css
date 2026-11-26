@@ -1,0 +1,72 @@
+/* One global stylesheet, raw colours and pixel values everywhere. */
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f7f7;
+  color: #333333;
+}
+
+.header {
+  background: #222222;
+  color: #ffffff;
+  padding: 16px 24px;
+  overflow: hidden;
+}
+
+.content {
+  padding: 24px;
+  min-height: 400px;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -8px;
+}
+
+.card {
+  background: #ffffff;
+  border: 2px solid #dddddd;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 8px;
+  width: 220px;
+  position: relative;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  color: #ff6600;
+}
+
+.btn {
+  background: #ff6600 !important;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #e65c00 !important;
+}
+
+.loading {
+  color: #999999;
+  font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .card {
+    width: 100%;
+  }
+}
