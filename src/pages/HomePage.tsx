@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import GreetingCard from '../components/GreetingCard';
 import { SAY_HELLO } from '../store';
 
@@ -10,10 +11,9 @@ function HomePage(props: any) {
   const [greetings, setGreetings] = useState<any>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
-
-  // Search params parsed and written by hand.
-  const params = new URLSearchParams(props.location.search);
-  const lang = params.get('lang') || 'all';
+  const navigate = useNavigate();
+  const search = useSearch({ from: '/' });
+  const lang = search.lang;
 
   useEffect(() => {
     setLoading(true);
@@ -31,7 +31,7 @@ function HomePage(props: any) {
 
   const changeLang = (e: any) => {
     const value = e.target.value;
-    props.history.push(value === 'all' ? '/' : '/?lang=' + value);
+    navigate({ to: '/', search: value === 'all' ? {} : { lang: value } });
   };
 
   if (loading) return <div className="loading">Loading...</div>;
@@ -67,7 +67,7 @@ function HomePage(props: any) {
             key={g.id}
             greeting={g}
             favourite={props.favourite === g.id}
-            onClick={() => props.history.push('/greetings/' + g.id)}
+            onClick={() => navigate({ to: '/greetings/$id', params: { id: String(g.id) } })}
           />
         ))}
       </div>

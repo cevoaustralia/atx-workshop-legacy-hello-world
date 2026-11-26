@@ -1,10 +1,10 @@
 import React from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { Link, useRouterState } from '@tanstack/react-router';
 import { connect } from 'react-redux';
 
 class Header extends React.Component<any, any> {
   render() {
-    const path = this.props.location.pathname;
+    const path = this.props.pathname;
     const linkStyle = (active: boolean) => ({
       color: active ? '#ff6600' : '#ffffff',
       marginLeft: '18px',
@@ -29,6 +29,12 @@ class Header extends React.Component<any, any> {
   }
 }
 
+// Wrapper to inject TanStack Router location
+function HeaderWrapper(props: any) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return <Header {...props} pathname={pathname} />;
+}
+
 const mapStateToProps = (state: any) => ({ helloCount: state.helloCount });
 
-export default connect(mapStateToProps)(withRouter(Header));
+export default connect(mapStateToProps)(HeaderWrapper);

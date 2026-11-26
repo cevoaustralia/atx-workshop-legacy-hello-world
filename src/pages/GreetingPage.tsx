@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { Link, withRouter } from 'react-router-dom';
+import { Link, useParams } from '@tanstack/react-router';
 import { connect } from 'react-redux';
 import GreetingCard from '../components/GreetingCard';
 import { SET_FAVOURITE } from '../store';
@@ -15,7 +15,7 @@ class GreetingPage extends React.Component<any, any> {
   }
 
   componentDidUpdate(prevProps: any) {
-    if (prevProps.match.params.id !== this.props.match.params.id) {
+    if (prevProps.params.id !== this.props.params.id) {
       this.load();
     }
   }
@@ -26,7 +26,7 @@ class GreetingPage extends React.Component<any, any> {
     axios
       .get(API_URL + '/greetings.json')
       .then((res: any) => {
-        const greeting = res.data.find((g: any) => String(g.id) === this.props.match.params.id);
+        const greeting = res.data.find((g: any) => String(g.id) === this.props.params.id);
         this.setState({ greeting, loading: false });
       })
       .catch((err: any) => this.setState({ error: err.message, loading: false }));
@@ -39,7 +39,7 @@ class GreetingPage extends React.Component<any, any> {
     if (!greeting) {
       return (
         <div>
-          <p>No greeting with id {this.props.match.params.id}.</p>
+          <p>No greeting with id {this.props.params.id}.</p>
           <Link to="/">Back</Link>
         </div>
       );
@@ -66,9 +66,15 @@ class GreetingPage extends React.Component<any, any> {
   }
 }
 
+// Wrapper to inject TanStack Router params
+function GreetingPageWrapper(props: any) {
+  const params = useParams({ from: '/greetings/$id' });
+  return <GreetingPage {...props} params={params} />;
+}
+
 const mapStateToProps = (state: any) => ({ favourite: state.favourite });
 const mapDispatchToProps = (dispatch: any) => ({
   setFavourite: (id: any) => dispatch({ type: SET_FAVOURITE, payload: id }),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(GreetingPage));
+export default connect(mapStateToProps, mapDispatchToProps)(GreetingPageWrapper);
