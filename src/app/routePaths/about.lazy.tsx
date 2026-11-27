@@ -1,6 +1,11 @@
+import { createLazyFileRoute } from '@tanstack/react-router';
 import React from 'react';
 
-export default function AboutPage() {
+export const Route = createLazyFileRoute('/about')({
+  component: AboutPage,
+});
+
+function AboutPage() {
   return (
     <div style={{ maxWidth: '600px', lineHeight: '1.6' }}>
       <h2 style={{ color: '#333333' }}>About</h2>
