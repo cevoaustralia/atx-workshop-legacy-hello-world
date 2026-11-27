@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Greeting } from '@/app/api/types';
+import type { Greeting } from '@/lib/api/models/greeting.models';
 
 interface GreetingCardProps {
   greeting: Greeting;

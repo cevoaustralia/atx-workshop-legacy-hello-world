@@ -1,11 +1,29 @@
+/**
+ * MSW Request Handlers
+ * Mock API responses for development and testing
+ * Uses runtime config and x-mock-scenario header for scenario selection
+ */
 import { http, HttpResponse } from 'msw';
+import { getConfig } from '@/microsite-config';
 import { defaultGreetingsFixture, emptyGreetingsFixture } from './fixtures/greetingsFixtures';
 import { parseScenarioHeader } from '@/app/scenarioTesting/scenarioRegistry';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+/**
+ * Get API base URL from runtime config
+ */
+function getApiUrl(): string {
+  return getConfig().apiUrl;
+}
 
+/**
+ * MSW handlers for API endpoints
+ */
 export const handlers = [
-  http.get(`${API_URL}/greetings.json`, ({ request }) => {
+  /**
+   * GET /greetings.json
+   * Returns greetings list with scenario support
+   */
+  http.get(`${getApiUrl()}/greetings.json`, ({ request }) => {
     // Parse x-mock-scenario header
     const scenarioHeader = request.headers.get('x-mock-scenario');
     const scenarios = parseScenarioHeader(scenarioHeader || '');
@@ -18,7 +36,10 @@ export const handlers = [
     }
     
     if (greetingsState === 'error') {
-      return HttpResponse.json({ error: 'Internal server error' }, { status: 500 });
+      return HttpResponse.json(
+        { error: 'Internal server error' }, 
+        { status: 500 }
+      );
     }
     
     // Default response

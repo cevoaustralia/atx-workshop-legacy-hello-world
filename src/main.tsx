@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { routeTree } from './app/routeTree/routeTree.gen';
+import { getConfig } from './microsite-config';
 import './styles.css';
 
 // Create Query Client
@@ -32,10 +33,14 @@ declare module '@tanstack/react-router' {
   }
 }
 
-// Initialize MSW in mock/mocked mode
+/**
+ * Initialize MSW in mocked mode
+ * Uses runtime config to determine if mocking should be enabled
+ */
 async function enableMocking() {
-  const mode = import.meta.env.MODE;
-  if (mode === 'mock' || mode === 'mocked') {
+  const config = getConfig();
+  
+  if (config.environment === 'mocked') {
     const { worker } = await import('./lib/mock-service/browser');
     return worker.start({
       onUnhandledRequest: 'bypass',

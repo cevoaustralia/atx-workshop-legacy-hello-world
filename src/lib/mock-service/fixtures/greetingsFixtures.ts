@@ -1,4 +1,8 @@
-import type { GreetingsList } from '@/app/api/types';
+/**
+ * Mock fixtures for greetings
+ * Types are derived from Valibot schemas
+ */
+import type { GreetingsList } from '@/lib/api/models/greeting.models';
 
 export const defaultGreetingsFixture: GreetingsList = [
   { id: 1, language: 'en', languageName: 'English', text: 'Hello, World!', note: 'The classic first program.' },
