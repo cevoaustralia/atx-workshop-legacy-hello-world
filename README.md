@@ -24,6 +24,12 @@ npm start              # Development server at http://localhost:5173
 npm run start:mock     # Development with MSW mocking
 npm run build          # Production build (type check + bundle)
 npm run preview        # Preview production build
+
+# Testing
+npm test               # Run unit & integration tests (Vitest)
+npm run test:watch     # Run tests in watch mode
+npm run playwright:run:smoke  # Run E2E smoke tests (Playwright)
+npm run smoke:check-coverage  # Check route coverage
 ```
 
 ## Application Features
@@ -57,6 +63,15 @@ npm run preview        # Preview production build
 ✅ **MSW mocking** with scenario support via `x-mock-scenario` header  
 ✅ **Feature flags** with environment-aware defaults and fail-closed lookups  
 
+### Test Coverage
+
+✅ **64 unit/integration tests** (Vitest + @testing-library/react)  
+✅ **14 E2E smoke tests** (Playwright)  
+✅ **100% route coverage** (3/3 routes)  
+✅ **Fixture-first testing** - Reusable test data builders  
+✅ **MSW mocking** for deterministic API responses  
+✅ **Coverage tracking** - Automated smoke route coverage checks  
+
 ### Project Structure
 
 ```
@@ -80,10 +95,21 @@ src/
 │   │   ├── generated/         # Future Orval-generated code
 │   │   ├── models/            # Valibot schemas (source of truth)
 │   │   └── mutator/           # Custom Axios client
-│   └── mock-service/          # MSW handlers and fixtures
+│   ├── mock-service/          # MSW handlers and fixtures
+│   └── testing/               # Test infrastructure
+│       ├── fixtures/          # Test data builders
+│       ├── mswServer.ts       # MSW server for tests
+│       └── setup.ts           # Vitest setup
 ├── main.tsx                   # App entry with providers
 ├── microsite-config.ts        # Runtime config types
 └── styles.css
+
+e2e/
+└── smoke/                     # Playwright smoke tests (E2E)
+    ├── about/                 # About page tests
+    ├── greetings/             # Greeting detail tests
+    ├── home/                  # Home page tests
+    └── utils/                 # Test utilities & coverage tracking
 
 public/
 ├── api/                       # Static JSON (dev fallback)
@@ -97,6 +123,7 @@ public/
 Comprehensive guides:
 
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Architecture, patterns, and workflow
+- **[docs/test-automation.md](docs/test-automation.md)** - Testing infrastructure (Vitest, Playwright, MSW)
 - **[docs/typescript-api-conventions.md](docs/typescript-api-conventions.md)** - TypeScript & API layer guide
 - [docs/project-overview.md](docs/project-overview.md) - Architecture overview
 - [docs/tanstack-router.md](docs/tanstack-router.md) - File-based routing
@@ -104,6 +131,7 @@ Comprehensive guides:
 - [docs/zustand-state-management.md](docs/zustand-state-management.md) - Client state
 - [docs/feature-flagging.md](docs/feature-flagging.md) - Feature flags
 - [docs/test-scenario-overrides.md](docs/test-scenario-overrides.md) - MSW mocking
+- [docs/mock-personas.md](docs/mock-personas.md) - Mock data reference
 - [src/app/components/README.md](src/app/components/README.md) - Component structure
 
 ## Development Guide
