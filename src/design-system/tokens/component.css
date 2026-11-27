@@ -1,0 +1,56 @@
+/**
+ * Component Design Tokens
+ * 
+ * Component-specific tokens that reference semantic tokens.
+ * These are ATOM base tokens - project overrides in src/app/styles/tokens/
+ * 
+ * These provide component-level theming.
+ */
+
+@import "./semantic.css";
+
+:root {
+  /* Button component tokens */
+  --btn-primary-bg: var(--color-brand-primary);
+  --btn-primary-bg-hover: var(--color-brand-primary-hover);
+  --btn-primary-text: var(--color-text-on-primary);
+  --btn-padding-x: 0.875rem; /* 14px */
+  --btn-padding-y: 0.5rem;   /* 8px */
+  --btn-radius: var(--radius-sm);
+  --btn-font-size: var(--font-size-body);
+
+  /* Card component tokens */
+  --card-bg: var(--color-surface-card);
+  --card-border: var(--color-border-default);
+  --card-border-hover: var(--color-border-hover);
+  --card-border-favourite: var(--color-brand-primary);
+  --card-shadow: var(--shadow-card);
+  --card-padding: var(--spacing-md);
+  --card-radius: var(--radius-md);
+  --card-gap: var(--spacing-sm);
+  --card-width: 13.75rem; /* 220px */
+
+  /* Badge component tokens */
+  --badge-text: var(--color-brand-primary);
+  --badge-font-size: var(--font-size-caption);
+  --badge-position-top: var(--spacing-sm);
+  --badge-position-right: var(--spacing-sm);
+
+  /* Header component tokens */
+  --header-bg: var(--color-surface-header);
+  --header-text: var(--color-text-on-dark);
+  --header-padding-x: var(--spacing-lg);
+  --header-padding-y: var(--spacing-md);
+
+  /* Layout component tokens */
+  --layout-content-padding: var(--spacing-lg);
+  --layout-content-min-height: 25rem; /* 400px */
+
+  /* Typography component tokens */
+  --typography-caption: var(--font-size-caption);
+  --typography-caption-color: var(--color-text-tertiary);
+  --typography-body: var(--font-size-body);
+  --typography-body-color: var(--color-text-secondary);
+  --typography-heading: var(--font-size-heading);
+  --typography-heading-color: var(--color-text-primary);
+}

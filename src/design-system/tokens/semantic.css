@@ -1,0 +1,56 @@
+/**
+ * Semantic Design Tokens
+ * 
+ * Purpose-driven tokens that reference primitives.
+ * These are ATOM base tokens - project overrides in src/app/styles/tokens/
+ * 
+ * Token names remain stable even when their values change.
+ * Application code should reference these or component tokens.
+ */
+
+@import "./primitive.css";
+
+:root {
+  /* Brand colors */
+  --color-brand-primary: var(--color-primitive-orange-500);
+  --color-brand-primary-hover: var(--color-primitive-orange-600);
+
+  /* Surface colors */
+  --color-surface-background: var(--color-primitive-grey-50);
+  --color-surface-card: var(--color-primitive-white);
+  --color-surface-header: var(--color-primitive-grey-900);
+
+  /* Text colors */
+  --color-text-primary: var(--color-primitive-grey-700);
+  --color-text-secondary: var(--color-primitive-grey-600);
+  --color-text-tertiary: var(--color-primitive-grey-500);
+  --color-text-muted: var(--color-primitive-grey-300);
+  --color-text-on-dark: var(--color-primitive-white);
+  --color-text-on-primary: var(--color-primitive-white);
+
+  /* Border colors */
+  --color-border-default: var(--color-primitive-grey-100);
+  --color-border-hover: var(--color-primitive-grey-300);
+  --color-border-focus: var(--color-brand-primary);
+
+  /* Shadow tokens */
+  --shadow-card: var(--primitive-shadow-sm);
+
+  /* Spacing tokens (semantic names) */
+  --spacing-xs: var(--primitive-spacing-1);
+  --spacing-sm: var(--primitive-spacing-2);
+  --spacing-md: var(--primitive-spacing-4);
+  --spacing-lg: var(--primitive-spacing-6);
+  --spacing-xl: var(--primitive-spacing-8);
+
+  /* Typography tokens */
+  --font-family-base: var(--primitive-font-family-sans);
+  --font-size-caption: var(--primitive-font-size-xs);
+  --font-size-body: var(--primitive-font-size-sm);
+  --font-size-base: var(--primitive-font-size-base);
+  --font-size-heading: var(--primitive-font-size-xl);
+
+  /* Radius tokens */
+  --radius-sm: var(--primitive-radius-sm);
+  --radius-md: var(--primitive-radius-md);
+}
