@@ -12,17 +12,17 @@ export const GreetingCard: React.FC<GreetingCardProps> = ({ greeting, favourite,
   return (
     <div
       className="card"
+      data-favourite={favourite}
       onClick={onClick}
       style={{
-        borderColor: favourite ? '#ff6600' : '#dddddd',
         cursor: onClick ? 'pointer' : 'default',
       }}
     >
-      <div style={{ fontSize: '11px', color: '#888888', textTransform: 'uppercase' }}>
+      <div className="text-caption">
         {greeting.languageName}
       </div>
-      <div style={{ fontSize: '26px', margin: '6px 0' }}>{greeting.text}</div>
-      {showNote && <div style={{ fontSize: '14px', color: '#555555' }}>{greeting.note}</div>}
+      <div className="text-heading" style={{ margin: '0.375rem 0' }}>{greeting.text}</div>
+      {showNote && <div className="text-body">{greeting.note}</div>}
       {favourite && <div className="badge">★ Favourite</div>}
     </div>
   );

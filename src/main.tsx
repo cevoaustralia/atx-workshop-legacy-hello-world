@@ -4,7 +4,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { routeTree } from './app/routeTree/routeTree.gen';
 import { getConfig } from './microsite-config';
-import './styles.css';
+import './index.css';
 
 // Create Query Client
 const queryClient = new QueryClient({

@@ -2,6 +2,7 @@
   "name": "legacy-hello-world",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "A deliberately outdated React hello-world SPA used to test the React Modernizer agents.",
   "scripts": {
     "start": "vite",
@@ -20,13 +21,16 @@
     "zustand": "^5.1.0"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.5",
     "@tanstack/router-devtools": "^1.167.4",
     "@tanstack/router-vite-plugin": "^1.167.49",
     "@types/react": "18.2.79",
     "@types/react-dom": "18.2.25",
-    "@vitejs/plugin-react": "4.2.1",
+    "@vitejs/plugin-react": "^6.3.0",
+    "postcss": "^8.5.33",
+    "tailwindcss": "^4.0.0",
     "typescript": "^5.9.3",
-    "vite": "4.5.14"
+    "vite": "^8.4.0"
   },
   "msw": {
     "workerDirectory": [

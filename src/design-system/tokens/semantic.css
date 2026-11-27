@@ -1,0 +1,53 @@
+/**
+ * Semantic Tokens (ATOM base layer)
+ * Purpose-driven tokens that reference primitives.
+ * Names remain stable; values can change.
+ * Application code should use these or component tokens.
+ */
+
+@layer semantic {
+  :root {
+    /* Brand colours */
+    --brand-primary: var(--primitive-orange-500);
+    --brand-primary-hover: var(--primitive-orange-600);
+
+    /* Surface colours */
+    --surface-background: var(--primitive-grey-50);
+    --surface-card: var(--primitive-white);
+    --surface-header: var(--primitive-grey-900);
+
+    /* Text colours */
+    --text-primary: var(--primitive-grey-700);
+    --text-secondary: var(--primitive-grey-600);
+    --text-tertiary: var(--primitive-grey-500);
+    --text-muted: var(--primitive-grey-300);
+    --text-on-dark: var(--primitive-white);
+    --text-on-primary: var(--primitive-white);
+
+    /* Border colours */
+    --border-default: var(--primitive-grey-100);
+    --border-hover: var(--primitive-grey-300);
+    --border-focus: var(--brand-primary);
+
+    /* Shadow tokens */
+    --shadow-card: var(--primitive-shadow-sm);
+
+    /* Spacing tokens (semantic names) */
+    --spacing-xs: var(--primitive-spacing-1);
+    --spacing-sm: var(--primitive-spacing-2);
+    --spacing-md: var(--primitive-spacing-4);
+    --spacing-lg: var(--primitive-spacing-6);
+    --spacing-xl: var(--primitive-spacing-8);
+
+    /* Typography tokens */
+    --font-family-base: var(--primitive-font-family-sans);
+    --font-size-caption: var(--primitive-font-size-xs);
+    --font-size-body: var(--primitive-font-size-sm);
+    --font-size-base: var(--primitive-font-size-base);
+    --font-size-heading: var(--primitive-font-size-xl);
+
+    /* Radius tokens */
+    --radius-sm: var(--primitive-radius-sm);
+    --radius-md: var(--primitive-radius-md);
+  }
+}
