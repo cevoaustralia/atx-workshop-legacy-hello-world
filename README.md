@@ -1,40 +1,128 @@
-# Legacy Hello World
+# Hello World - Modernized React SPA
 
-A small React SPA that says hello in six languages. It is **deliberately outdated** so it can be used to test the React Modernizer and React Router to TanStack Router agents through ATX.
+A modern React 18 + TypeScript + Vite application that says hello in six languages.
 
-It works as is: `npm run build` passes (it runs `tsc --noEmit`, then `vite build`), and the app runs without a backend, because the "API" is a static file in `public/api/greetings.json`.
+**Status**: Successfully modernized with TanStack Router, TanStack Query, Zustand, atomic-design components, MSW mocking, and feature flags.
 
-## Run it
+## Tech Stack
+
+- **React 18.2** with modern patterns (function components, hooks)
+- **TypeScript 5.7** with strict mode
+- **Vite 4.5** for build and dev server
+- **TanStack Router 1.87** - Type-safe file-based routing
+- **TanStack Query 5.62** - Server state management with wrapper hooks
+- **Zustand 5** - Client state with atomic selectors and sessionStorage persistence
+- **Valibot 0.42** - Search param validation
+- **MSW 2.15** - API mocking for development and testing
+
+## Quick Start
 
 ```sh
 npm ci
-npm start          # http://localhost:3000
-npm run build
+npm start              # Development server at http://localhost:3000
+npm run start:mock     # Development with MSW mocking
+npm run build          # Production build
+npm run preview        # Preview production build
 ```
 
-## What the app does
+## Application Features
 
-- `/` lists the greetings, filters them by language with `?lang=<code>`, and has a "Say hello" counter shown in the header.
-- `/greetings/:id` shows one greeting and lets you mark it as your favourite.
-- `/about` is a static page. `/home` redirects to `/`. Any other path shows a 404 page.
+- **`/`** - Lists greetings, filters by language (`?lang=<code>`), "Say hello" counter in header
+- **`/greetings/:id`** - View greeting detail and mark as favourite
+- **`/about`** - Static about page
+- Type-safe routing with TanStack Router
+- State persists in sessionStorage (favourites, hello count)
 
-## Outdated practices, and which agent should fix them
+## Architecture
 
-| Area | What is in this app | Target standard | Agent |
-|---|---|---|---|
-| Routing | React Router v5: `Switch`, `component=` routes, `withRouter`, `props.history.push`, `props.match.params`, `Redirect`, a `path="*"` 404 | TanStack Router file-based routes, typed params, `notFoundComponent`, `redirect` | `react-router-to-tanstack-router`, or `react-modernizer-react-developer` |
-| Search params | `?lang=` read with `new URLSearchParams` and written by string concatenation | `validateSearch` with a Valibot schema and typed `navigate({ search })` | Router agents |
-| Components | Class components (`Header`, `GreetingPage`), flat `components/` and `pages/` folders | Function components in the atomic-design layout (`atom/`, `molecule/`, `organism/`, `templates/`, pages separate) | `react-modernizer-react-developer` |
-| React root | `ReactDOM.render` (deprecated since React 18) | `createRoot` | `react-modernizer-react-developer` |
-| State | Redux 4 `createStore` with hand-written action types, `connect`, `mapStateToProps` | Zustand store with atomic selectors and sessionStorage persistence | `react-modernizer-react-developer` |
-| Data fetching | `axios` calls in `useEffect` and `componentDidMount`, manual loading and error state, no caching, the detail page refetches the whole list | TanStack Query wrapper hooks and selectors | `react-modernizer-react-developer` |
-| Types | `strict: false`, `any` for props, state, API data and Redux | `strict: true`, models derived from schemas, no unsafe `any` | `react-modernizer-typescript-engineer` |
-| Config | `import.meta.env.VITE_API_URL` read inside components | Runtime `window.CONFIG` | `react-modernizer-typescript-engineer` |
-| API layer | Untyped `axios` calls to a hard-coded path | A typed API client (for example Orval-generated) | `react-modernizer-typescript-engineer` |
-| Styling | One global stylesheet plus inline `style={{...}}` everywhere, raw hex colours and pixel values, `!important`, `float` layout | Design tokens (primitive, semantic, component), Tailwind v4, shadcn/ui | `react-modernizer-design-system-engineer` |
-| Tooling | Vite 4, TypeScript 4.9, React 18.2 | Vite 7, TypeScript 5.x, React 18 or later | Several agents |
-| Tests | None, and no `test` script | Vitest unit tests, Playwright smoke specs, MSW fixtures | `react-modernizer-test-automation-engineer` |
+### Modern React Patterns
 
-## Using it with ATX
+✅ **File-based routing** with TanStack Router
+✅ **Atomic-design components** (atom/molecule/organism/templates)
+✅ **Wrapper hooks pattern** for API calls
+✅ **Atomic Zustand selectors** for granular state subscriptions
+✅ **sessionStorage persistence** for client state
+✅ **Valibot schema validation** for search params
+✅ **MSW mocking** with scenario support
+✅ **Feature flags** with environment-aware defaults
 
-The agents clone a git repository over HTTPS, so this folder must be pushed to **its own repository**, with `package.json` at the root. To let the agents push their changes, put a Git token in Secrets Manager and give its ID when the orchestrator asks. The agents' execution role also needs `secretsmanager:GetSecretValue` on that secret.
+### Project Structure
+
+```
+src/
+├── app/
+│   ├── api/              # TanStack Query hooks and selectors
+│   ├── components/       # Atomic-design structure
+│   ├── featureFlag/      # Feature flag system
+│   ├── routePaths/       # File-based routes
+│   └── stores/           # Zustand stores
+├── lib/mock-service/     # MSW handlers and fixtures
+└── main.tsx              # App entry with providers
+```
+
+## Documentation
+
+Comprehensive guides in [`docs/`](docs/):
+
+- [Project Overview](docs/project-overview.md) - Architecture and conventions
+- [TanStack Router](docs/tanstack-router.md) - File-based routing guide
+- [TanStack Query](docs/tanstack-query.md) - Data fetching patterns
+- [Zustand State Management](docs/zustand-state-management.md) - Client state guide
+- [Feature Flagging](docs/feature-flagging.md) - Feature flag usage
+- [Test Scenario Overrides](docs/test-scenario-overrides.md) - MSW mocking guide
+- [Component Structure](src/app/components/README.md) - Atomic design placement
+
+## Development
+
+### Adding a Route
+
+1. Create config: `src/app/routePaths/my-route.tsx`
+2. Create lazy component: `src/app/routePaths/my-route.lazy.tsx`
+3. Route tree regenerates automatically
+
+### Adding a Component
+
+Place at the correct atomic level:
+- `atom/` - Single-element wrappers
+- `molecule/` - Multi-atom components
+- `organism/` - Complex sections with logic
+- `templates/` - Page layouts
+
+### Adding an API Call
+
+1. Create wrapper hook in `src/app/api/queries/`
+2. Add selectors in `src/app/api/selectors/`
+3. Use in components via wrapper hooks
+
+### Mocking APIs
+
+Run `npm run start:mock` to use MSW mocks. Add handlers in `src/lib/mock-service/handlers.ts` and fixtures in `fixtures/`.
+
+## Modernization Summary
+
+| Area | Before | After |
+|------|--------|-------|
+| Routing | React Router v5 | TanStack Router file-based |
+| Search params | Manual URLSearchParams | Valibot schema validation |
+| Components | Class components | Function components with hooks |
+| Component layout | Flat folders | Atomic-design structure |
+| React root | `ReactDOM.render` | `createRoot` |
+| State | Redux with connect/mapStateToProps | Zustand with atomic selectors |
+| Data fetching | Manual axios in useEffect | TanStack Query wrapper hooks |
+| TypeScript | `strict: false`, `any` everywhere | `strict: true`, proper types |
+| Mocking | None | MSW with scenario support |
+
+## Key Conventions
+
+- **Path alias**: `@/` → `src/`
+- **Never hand-edit**: `routeTree.gen.ts`
+- **Atomic selectors**: Export granular Zustand selectors
+- **Wrapper hooks**: Always use wrappers, not raw API calls
+- **sessionStorage**: Client state persists per-session only
+- **Fail closed**: Feature flags default to false
+
+## Legacy History
+
+This app was deliberately outdated (React Router v5, Redux, class components) for testing React modernization tools. It has been successfully modernized to current best practices.
+
+The "API" is a static file at `public/api/greetings.json` - no backend needed.
