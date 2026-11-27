@@ -61,8 +61,8 @@ describe('greetingSelectors', () => {
       const result = selectGreetingsByLanguage(greetings, 'en');
       
       expect(result).toHaveLength(2);
-      expect(result[0].language).toBe('en');
-      expect(result[1].language).toBe('en');
+      expect(result[0]?.language).toBe('en');
+      expect(result[1]?.language).toBe('en');
     });
 
     it('should return empty list when no matches', () => {
