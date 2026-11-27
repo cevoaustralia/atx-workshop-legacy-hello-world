@@ -1,0 +1,14 @@
+/**
+ * Application Token Overrides
+ * 
+ * Project-specific token customizations.
+ * These override ATOM base tokens via higher CSS specificity.
+ * 
+ * Example:
+ * :root {
+ *   --color-brand-primary: #custom-color;
+ *   --btn-primary-bg: var(--color-brand-primary);
+ * }
+ */
+
+/* Add project-specific token overrides here */
