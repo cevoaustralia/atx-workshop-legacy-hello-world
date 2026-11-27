@@ -2,7 +2,6 @@
  * Feature flag store with typed keys and runtime config
  * Following the convention: FEATURE_FLAG_KEYS and FEATURE_FLAGS must stay in sync
  */
-import React from 'react';
 import { create } from 'zustand';
 import { getConfig } from '@/microsite-config';
 
@@ -100,22 +99,11 @@ export function isFeatureEnabled(key: FeatureFlagKey): boolean {
   
   // Overrides only work in non-production
   if (env !== 'production' && key in state.overrides) {
-    return state.overrides[key];
+    const overrideValue = state.overrides[key];
+    return overrideValue ?? false;
   }
   
   // Fail closed - missing key returns false
-  return state.flags[key] ?? false;
+  const flagValue = state.flags[key];
+  return flagValue ?? false;
 }
-
-/**
- * Feature flag gate component
- * Renders children only if feature is enabled
- */
-export const FeatureFlagGate: React.FC<{
-  featureKey: FeatureFlagKey;
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}> = ({ featureKey, children, fallback = null }) => {
-  const isEnabled = isFeatureEnabled(featureKey);
-  return React.createElement(React.Fragment, null, isEnabled ? children : fallback);
-};

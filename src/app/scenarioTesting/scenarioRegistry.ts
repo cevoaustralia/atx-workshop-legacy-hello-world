@@ -80,7 +80,12 @@ export function parseScenarioHeader(header: string): Record<string, Record<strin
   header.split(',').forEach(part => {
     const match = part.match(/^(\w+)\.(\w+)=(.+)$/);
     if (match) {
-      const [, featureKey, dimensionKey, value] = match;
+      const featureKey = match[1];
+      const dimensionKey = match[2];
+      const value = match[3];
+      
+      if (!featureKey || !dimensionKey || !value) return;
+      
       if (!selections[featureKey]) {
         selections[featureKey] = {};
       }

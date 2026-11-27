@@ -1,5 +1,4 @@
 import { createLazyFileRoute, Link } from '@tanstack/react-router';
-import React from 'react';
 import { useGetGreetingsQuery } from '@/app/api/queries/useGetGreetingsQuery';
 import { selectGreetingById } from '@/app/api/selectors/greetingSelectors';
 import { GreetingCard } from '@/app/components/molecule/GreetingCard';

@@ -28,8 +28,8 @@ export const handlers = [
     const scenarioHeader = request.headers.get('x-mock-scenario');
     const scenarios = parseScenarioHeader(scenarioHeader || '');
     
-    // Check greeting scenarios
-    const greetingsState = scenarios.greetings?.state;
+    // Check greeting scenarios with safe property access
+    const greetingsState = scenarios['greetings']?.['state'];
     
     if (greetingsState === 'empty') {
       return HttpResponse.json(emptyGreetingsFixture);
