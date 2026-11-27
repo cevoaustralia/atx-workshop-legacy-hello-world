@@ -32,15 +32,30 @@ declare module '@tanstack/react-router' {
   }
 }
 
+// Initialize MSW in mock/mocked mode
+async function enableMocking() {
+  const mode = import.meta.env.MODE;
+  if (mode === 'mock' || mode === 'mocked') {
+    const { worker } = await import('./lib/mock-service/browser');
+    return worker.start({
+      onUnhandledRequest: 'bypass',
+    });
+  }
+  return Promise.resolve();
+}
+
 // Render app
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element not found');
 
 const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  </StrictMode>
-);
+
+enableMocking().then(() => {
+  root.render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </StrictMode>
+  );
+});

@@ -5,6 +5,7 @@
   "description": "A deliberately outdated React hello-world SPA used to test the React Modernizer agents.",
   "scripts": {
     "start": "vite",
+    "start:mock": "vite --mode mock",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview"
   },
@@ -26,5 +27,10 @@
     "@vitejs/plugin-react": "4.2.1",
     "typescript": "^5.9.3",
     "vite": "4.5.14"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
