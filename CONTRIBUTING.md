@@ -1,330 +1,403 @@
 # Contributing Guide
 
-## Development Setup
+Welcome! This guide covers the architecture, conventions, and development workflow for this modernized React application.
+
+## Table of Contents
+
+1. [Quick Start](#quick-start)
+2. [Architecture Overview](#architecture-overview)
+3. [Project Structure](#project-structure)
+4. [Development Workflow](#development-workflow)
+5. [TypeScript Guidelines](#typescript-guidelines)
+6. [Component Patterns](#component-patterns)
+7. [State Management](#state-management)
+8. [API Integration](#api-integration)
+9. [Testing Strategy](#testing-strategy)
+10. [Commit Conventions](#commit-conventions)
+
+---
+
+## Quick Start
 
 ```bash
+# Install dependencies
 npm ci
-npm start              # Development server
-npm run start:mock     # Development with MSW mocking
-npm run build          # Production build
-```
 
-## Architecture Overview
+# Development server
+npm start
 
-This is a **modern React application** using:
-- TanStack Router for file-based routing
-- TanStack Query for server state
-- Zustand for client state
-- MSW for API mocking
-- Atomic-design component structure
+# Development with MSW mocking
+npm run start:mock
 
-See [docs/project-overview.md](docs/project-overview.md) for complete architecture details.
-
-## Development Conventions
-
-### Path Alias
-
-Use `@/` for all imports from `src/`:
-
-```typescript
-// ✅ Good
-import { useGetGreetingsQuery } from '@/app/api/queries/useGetGreetingsQuery';
-
-// ❌ Bad
-import { useGetGreetingsQuery } from '../../../app/api/queries/useGetGreetingsQuery';
-```
-
-### TypeScript
-
-- **Strict mode enabled** - No `any` types without justification
-- **Explicit return types** for exported functions
-- **Infer types** from Valibot schemas, don't duplicate
-
-### Component Placement
-
-Follow atomic-design principles in `src/app/components/`:
-
-| Level | Use Case | Examples |
-|-------|----------|----------|
-| `atom/` | Single-element wrappers | Link, Icon, Button |
-| `molecule/` | 2+ atoms, one purpose | InputField, GreetingCard |
-| `organism/` | Complex sections with logic | Header, SideNav |
-| `templates/` | Page layouts | Layout, Page, TileGrid |
-
-**Feature pages** go in `src/app/pages/`, not in components.
-
-See [src/app/components/README.md](src/app/components/README.md) for detailed rules.
-
-### Routing
-
-#### Adding a Route
-
-1. **Create route config** in `src/app/routePaths/`:
-
-```typescript
-// src/app/routePaths/users.$id.tsx
-import { createFileRoute } from '@tanstack/react-router';
-import * as v from 'valibot';
-
-const searchSchema = v.object({
-  tab: v.optional(v.string()),
-});
-
-type SearchSchema = v.InferOutput<typeof searchSchema>;
-
-export const Route = createFileRoute('/users/$id')({
-  validateSearch: (search): SearchSchema => v.parse(searchSchema, search),
-});
-```
-
-2. **Create lazy component**:
-
-```typescript
-// src/app/routePaths/users.$id.lazy.tsx
-import { createLazyFileRoute } from '@tanstack/react-router';
-
-export const Route = createLazyFileRoute('/users/$id')({
-  component: UserDetailPage,
-});
-
-function UserDetailPage() {
-  const { id } = Route.useParams();
-  const { tab } = Route.useSearch();
-  // Component implementation
-}
-```
-
-3. Route tree regenerates automatically on dev server restart.
-
-See [docs/tanstack-router.md](docs/tanstack-router.md) for complete routing guide.
-
-### Data Fetching
-
-#### Create Wrapper Hooks
-
-**Always use wrapper hooks**, never call axios or generated clients directly.
-
-```typescript
-// src/app/api/queries/useGetUsersQuery.ts
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import type { User } from '../types';
-
-const API_URL = import.meta.env.VITE_API_URL || '/api';
-
-const fetchUsers = async (): Promise<User[]> => {
-  const response = await axios.get<User[]>(`${API_URL}/users.json`);
-  return response.data;
-};
-
-export const useGetUsersQuery = () => {
-  return useQuery({
-    queryKey: ['users', 'list'],
-    queryFn: fetchUsers,
-  });
-};
-```
-
-#### Use in Components
-
-```typescript
-import { useGetUsersQuery } from '@/app/api/queries/useGetUsersQuery';
-
-function UserList() {
-  const { data: users, isLoading, error } = useGetUsersQuery();
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {String(error)}</div>;
-
-  return <ul>{users?.map(user => <li key={user.id}>{user.name}</li>)}</ul>;
-}
-```
-
-See [docs/tanstack-query.md](docs/tanstack-query.md) for complete data fetching guide.
-
-### State Management
-
-#### Zustand Stores
-
-Create stores in `src/app/stores/` with:
-- **sessionStorage persistence**
-- **Atomic selectors** for granular subscriptions
-
-```typescript
-// src/app/stores/userStore.ts
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-
-interface UserState {
-  preferences: UserPreferences;
-  setPreferences: (prefs: UserPreferences) => void;
-}
-
-export const useUserStore = create<UserState>()(
-  persist(
-    (set) => ({
-      preferences: {},
-      setPreferences: (prefs) => set({ preferences: prefs }),
-    }),
-    {
-      name: 'user-storage',
-      storage: {
-        getItem: (name) => {
-          const str = sessionStorage.getItem(name);
-          return str ? JSON.parse(str) : null;
-        },
-        setItem: (name, value) => {
-          sessionStorage.setItem(name, JSON.stringify(value));
-        },
-        removeItem: (name) => sessionStorage.removeItem(name),
-      },
-    }
-  )
-);
-
-// Atomic selectors
-export const useUserPreferences = () => 
-  useUserStore((state) => state.preferences);
-export const useSetUserPreferences = () => 
-  useUserStore((state) => state.setPreferences);
-```
-
-See [docs/zustand-state-management.md](docs/zustand-state-management.md) for complete guide.
-
-### Mocking APIs
-
-#### Add Fixtures
-
-```typescript
-// src/lib/mock-service/fixtures/usersFixtures.ts
-import type { User } from '@/app/api/types';
-
-export const defaultUsersFixture: User[] = [
-  { id: 1, name: 'Alice', role: 'admin' },
-  { id: 2, name: 'Bob', role: 'user' },
-];
-
-export const emptyUsersFixture: User[] = [];
-```
-
-#### Add Handler
-
-```typescript
-// src/lib/mock-service/handlers.ts
-import { http, HttpResponse } from 'msw';
-import { defaultUsersFixture, emptyUsersFixture } from './fixtures/usersFixtures';
-
-const API_URL = import.meta.env.VITE_API_URL || '/api';
-
-export const handlers = [
-  // ... existing handlers
-  http.get(`${API_URL}/users.json`, ({ request }) => {
-    const scenarioHeader = request.headers.get('x-mock-scenario');
-    
-    if (scenarioHeader?.includes('users.state=empty')) {
-      return HttpResponse.json(emptyUsersFixture);
-    }
-    
-    return HttpResponse.json(defaultUsersFixture);
-  }),
-];
-```
-
-See [docs/test-scenario-overrides.md](docs/test-scenario-overrides.md) for complete mocking guide.
-
-### Feature Flags
-
-#### Add a Flag
-
-```typescript
-// src/app/featureFlag/featureFlagStore.ts
-
-// 1. Add key
-export const FEATURE_FLAG_KEYS = {
-  // ... existing
-  NEW_FEATURE: 'new_feature',
-} as const;
-
-// 2. Add configuration
-const FEATURE_FLAGS = {
-  // ... existing
-  [FEATURE_FLAG_KEYS.NEW_FEATURE]: { 
-    demo: true,  // Enabled in dev/demo
-    dev: true,
-    prod: false  // Disabled in production
-  },
-};
-```
-
-#### Use in Components
-
-```typescript
-import { FeatureFlagGate, FEATURE_FLAG_KEYS } from '@/app/featureFlag/featureFlagStore';
-
-function MyComponent() {
-  return (
-    <FeatureFlagGate featureKey={FEATURE_FLAG_KEYS.NEW_FEATURE}>
-      <NewFeature />
-    </FeatureFlagGate>
-  );
-}
-```
-
-See [docs/feature-flagging.md](docs/feature-flagging.md) for complete guide.
-
-## Code Quality
-
-### Type Safety
-
-```typescript
-// ✅ Good - explicit types
-function processUser(user: User): UserProfile {
-  return { id: user.id, name: user.name };
-}
-
-// ❌ Bad - implicit any
-function processUser(user) {
-  return { id: user.id, name: user.name };
-}
-```
-
-### Atomic Selectors
-
-```typescript
-// ✅ Good - atomic selector
-const count = useHelloCount();
-
-// ❌ Bad - subscribes to entire store
-const count = useGreetingsStore((state) => state.helloCount);
-```
-
-### Navigation
-
-```typescript
-// ✅ Good - typed navigation
-navigate({ to: '/users/$id', params: { id: '123' } });
-
-// ❌ Bad - string navigation
-navigate('/users/123');
-```
-
-## Testing
-
-(To be added by test-automation engineer)
-
-## Build and Deployment
-
-```bash
-# Type check
-npm run build  # Runs tsc --noEmit && vite build
-
-# Production build
+# Build for production
 npm run build
 
 # Preview production build
 npm run preview
 ```
 
+---
+
+## Architecture Overview
+
+This application uses a **modern React architecture** with:
+
+- **React 18** with function components and hooks
+- **TypeScript 5.9+** with strict mode enabled
+- **TanStack Router** (v1) for file-based routing
+- **TanStack Query** (v5) for server state management
+- **Zustand** for client state with sessionStorage persistence
+- **Valibot** for runtime validation and type inference
+- **MSW** for API mocking in development
+- **Vite** for fast builds and HMR
+
+### Key Architectural Decisions
+
+1. **Runtime Configuration** - Config injected via `window.CONFIG`, not build-time env vars
+2. **Schema-Derived Types** - Types inferred from Valibot schemas, not hand-written
+3. **Atomic Design** - Components organized by complexity (atom/molecule/organism/template)
+4. **Wrapper Hook Pattern** - App-specific hooks wrap generated/library hooks
+5. **Fail-Closed Patterns** - Feature flags and scenario lookups default to safe values
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── queries/           # TanStack Query wrapper hooks
+│   │   ├── selectors/         # Data transformation functions
+│   │   └── types.ts           # (deprecated - use lib/api/models)
+│   ├── components/
+│   │   ├── atom/              # Single-element components (Link)
+│   │   ├── molecule/          # Multi-atom components (GreetingCard)
+│   │   ├── organism/          # Complex components (Header)
+│   │   └── templates/         # Page layouts (Layout)
+│   ├── featureFlag/
+│   │   └── featureFlagStore.ts
+│   ├── routePaths/            # TanStack Router file-based routes
+│   │   ├── __root.tsx
+│   │   ├── index.tsx / index.lazy.tsx
+│   │   ├── about.tsx / about.lazy.tsx
+│   │   └── greetings.$id.tsx / greetings.$id.lazy.tsx
+│   ├── routeTree/
+│   │   └── routeTree.gen.ts   # Generated - do not edit
+│   ├── scenarioTesting/       # MSW scenario infrastructure
+│   └── stores/                # Zustand stores
+├── lib/
+│   ├── api/
+│   │   ├── generated/         # Future Orval-generated code
+│   │   │   ├── models/
+│   │   │   └── services/
+│   │   ├── models/            # Valibot schemas and types
+│   │   └── mutator/
+│   │       └── axiosClient.ts # Custom Axios instance
+│   └── mock-service/
+│       ├── browser.ts         # MSW browser worker
+│       ├── handlers.ts        # MSW request handlers
+│       └── fixtures/          # Mock data
+├── main.tsx                   # Application entry point
+├── microsite-config.ts        # Runtime config types
+└── styles.css
+
+public/
+├── api/                       # Static JSON files (dev fallback)
+├── config.development.js      # Runtime config - development
+├── config.mock.js             # Runtime config - mocked mode
+├── config.production.js       # Runtime config stub (replaced by deployment)
+└── mockServiceWorker.js       # MSW service worker
+
+docs/
+└── typescript-api-conventions.md  # Detailed TypeScript/API guide
+
+specs/
+└── README.md                  # OpenAPI integration guide (future)
+```
+
+---
+
+## Development Workflow
+
+### Local Development
+
+```bash
+# Start dev server (uses public/api/*.json)
+npm start
+
+# Start with MSW mocking (uses handlers.ts)
+npm run start:mock
+```
+
+In **mock mode**, MSW intercepts API calls and responds with fixtures. Use the `x-mock-scenario` header (via sessionStorage) to test different API states.
+
+### Type Checking
+
+```bash
+# Type check only
+npx tsc --noEmit
+
+# Full build (type check + bundle)
+npm run build
+```
+
+### Code Quality
+
+We use **TypeScript strict mode** with additional checks:
+- `noUnusedLocals` / `noUnusedParameters`
+- `noImplicitReturns`
+- `noUncheckedIndexedAccess`
+- `noPropertyAccessFromIndexSignature`
+
+All code must pass `tsc --noEmit` with zero errors.
+
+---
+
+## TypeScript Guidelines
+
+See **[docs/typescript-api-conventions.md](./docs/typescript-api-conventions.md)** for comprehensive guidelines.
+
+### Quick Rules
+
+1. **No `any`** - Use `unknown` + narrowing or generics
+2. **Derive types from schemas** - Use `v.InferOutput<typeof Schema>`
+3. **Never edit generated files** - Fix the source and regenerate
+4. **Use `@/` path alias** - `import { X } from '@/lib/api/models'`
+5. **Explicit public signatures** - Don't rely on inference for exports
+
+### Runtime Config
+
+**Always** use `window.CONFIG`, **never** `import.meta.env` for app config:
+
+```typescript
+import { getConfig } from '@/microsite-config';
+
+const config = getConfig();
+const apiUrl = config.apiUrl;
+```
+
+---
+
+## Component Patterns
+
+### Atomic Design Structure
+
+- **Atom** - Single element, no internal state (e.g., `Link`)
+- **Molecule** - Combines atoms, may have local state (e.g., `GreetingCard`)
+- **Organism** - Complex logic, connects to stores/queries (e.g., `Header`)
+- **Template** - Page layout, defines structure (e.g., `Layout`)
+
+### Component Example
+
+```typescript
+import type { Greeting } from '@/lib/api/models';
+
+interface GreetingCardProps {
+  greeting: Greeting;
+  favourite?: boolean;
+  onClick?: () => void;
+}
+
+export function GreetingCard({ greeting, favourite, onClick }: GreetingCardProps) {
+  return (
+    <div onClick={onClick}>
+      <h3>{greeting.text}</h3>
+      {favourite && <span>⭐</span>}
+    </div>
+  );
+}
+```
+
+**Use function declarations** for exported components, not arrow functions - better for debugging.
+
+---
+
+## State Management
+
+### Server State (TanStack Query)
+
+```typescript
+// src/app/api/queries/useGetGreetingsQuery.ts
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api/mutator/axiosClient';
+import { parseGreetingsList, type GreetingsList } from '@/lib/api/models';
+
+export const greetingsQueryKeys = {
+  all: ['greetings'] as const,
+  lists: () => [...greetingsQueryKeys.all, 'list'] as const,
+};
+
+export function useGetGreetingsQuery() {
+  return useQuery({
+    queryKey: greetingsQueryKeys.lists(),
+    queryFn: async () => {
+      const data = await apiClient.get<unknown>('/greetings.json');
+      return parseGreetingsList(data);
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+}
+```
+
+### Client State (Zustand)
+
+```typescript
+// src/app/stores/greetingsStore.ts
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+interface GreetingsState {
+  favouriteGreetingId: number | null;
+  setFavouriteGreetingId: (id: number | null) => void;
+}
+
+export const useGreetingsStore = create<GreetingsState>()(
+  persist(
+    (set) => ({
+      favouriteGreetingId: null,
+      setFavouriteGreetingId: (id) => set({ favouriteGreetingId: id }),
+    }),
+    {
+      name: 'greetings-storage',
+      storage: {
+        getItem: (name) => JSON.parse(sessionStorage.getItem(name) || 'null'),
+        setItem: (name, value) => sessionStorage.setItem(name, JSON.stringify(value)),
+        removeItem: (name) => sessionStorage.removeItem(name),
+      },
+    }
+  )
+);
+
+// Atomic selector
+export const useFavouriteGreetingId = () => 
+  useGreetingsStore((state) => state.favouriteGreetingId);
+```
+
+---
+
+## API Integration
+
+### 1. Define Valibot Schema
+
+```typescript
+// src/lib/api/models/greeting.models.ts
+import * as v from 'valibot';
+
+export const GreetingSchema = v.object({
+  id: v.number(),
+  language: v.string(),
+  text: v.string(),
+});
+
+export type Greeting = v.InferOutput<typeof GreetingSchema>;
+
+export function parseGreeting(data: unknown): Greeting {
+  return v.parse(GreetingSchema, data);
+}
+```
+
+### 2. Create Wrapper Hook
+
+```typescript
+// src/app/api/queries/useGetGreetingQuery.ts
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api/mutator/axiosClient';
+import { parseGreeting, type Greeting } from '@/lib/api/models';
+
+export function useGetGreetingQuery(id: string) {
+  return useQuery({
+    queryKey: ['greeting', id],
+    queryFn: async () => {
+      const data = await apiClient.get<unknown>(`/greetings/${id}.json`);
+      return parseGreeting(data);
+    },
+  });
+}
+```
+
+### 3. Use in Component
+
+```typescript
+import { useGetGreetingQuery } from '@/app/api/queries';
+
+function GreetingPage() {
+  const { data, isLoading, error } = useGetGreetingQuery('1');
+  
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {String(error)}</div>;
+  
+  return <div>{data?.text}</div>;
+}
+```
+
+---
+
+## Testing Strategy
+
+### Unit Tests (Future)
+
+- **Vitest** for fast unit tests
+- Test selectors and pure functions
+- Mock MSW for integration tests
+
+### MSW Scenarios
+
+Use `x-mock-scenario` header to test different API states:
+
+```typescript
+// In browser console or test setup
+sessionStorage.setItem('mockScenario', 'greetings.state=empty');
+```
+
+Scenarios are defined in `src/app/scenarioTesting/scenarios/`.
+
+---
+
+## Commit Conventions
+
+We use **Conventional Commits** with **PascalCase scopes**:
+
+```
+<type>(<scope>): <subject>
+
+[optional body]
+```
+
+### Types
+
+- `feat` - New feature
+- `fix` - Bug fix
+- `refactor` - Code change that neither fixes a bug nor adds a feature
+- `docs` - Documentation only
+- `test` - Adding or updating tests
+- `chore` - Maintenance tasks
+
+### Scopes (PascalCase)
+
+- `Api` - API layer changes
+- `Components` - Component changes
+- `Routes` - Routing changes
+- `TypeScript` - Type system improvements
+- `Config` - Configuration changes
+
+### Examples
+
+```
+feat(Api): Add user authentication endpoint
+refactor(Components): Migrate Button to atomic structure
+docs(TypeScript): Add Valibot schema guidelines
+fix(Routes): Handle missing greeting ID gracefully
+```
+
+**Never add AI-tool attribution or co-author trailers.**
+
+---
+
 ## Questions?
 
-See documentation in `docs/` or ask in team channels.
+- Check **[docs/typescript-api-conventions.md](./docs/typescript-api-conventions.md)** for TypeScript/API details
+- Review existing code for patterns
+- Ask in team chat for clarification
+
+Happy coding! 🚀
