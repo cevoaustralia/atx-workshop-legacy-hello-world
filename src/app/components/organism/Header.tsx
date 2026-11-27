@@ -1,31 +1,60 @@
 import React from 'react';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { useHelloCount } from '@/app/stores/greetingsStore';
+import { cn } from '@/design-system/lib/utils';
 
 export const Header: React.FC = () => {
   const helloCount = useHelloCount();
   const router = useRouterState();
   const pathname = router.location.pathname;
 
-  const linkStyle = (active: boolean): React.CSSProperties => ({
-    color: active ? '#ff6600' : '#ffffff',
-    marginLeft: '18px',
-    textDecoration: 'none',
-    fontWeight: active ? 'bold' : 'normal',
-  });
-
   return (
-    <div className="header">
-      <span style={{ fontSize: '22px', fontWeight: 'bold' }}>👋 Hello World</span>
-      <span style={{ float: 'right' }}>
-        <Link to="/" search={undefined} style={linkStyle(pathname === '/')}>
-          Home
-        </Link>
-        <Link to="/about" search={undefined} style={linkStyle(pathname === '/about')}>
-          About
-        </Link>
-        <span style={{ marginLeft: '18px', color: '#ffcc00' }}>Hellos: {helloCount}</span>
-      </span>
-    </div>
+    <header className="header">
+      <div className="flex items-center justify-between">
+        <span className="text-xl font-bold">👋 Hello World</span>
+        
+        <nav className="flex items-center gap-6">
+          <Link
+            to="/"
+            search={undefined}
+            className={cn(
+              "no-underline transition-colors hover:opacity-80",
+              pathname === '/' 
+                ? "font-bold" 
+                : "font-normal"
+            )}
+            style={{ 
+              color: pathname === '/' 
+                ? 'var(--color-brand-primary)' 
+                : 'var(--color-text-on-dark)' 
+            }}
+          >
+            Home
+          </Link>
+          
+          <Link
+            to="/about"
+            search={undefined}
+            className={cn(
+              "no-underline transition-colors hover:opacity-80",
+              pathname === '/about' 
+                ? "font-bold" 
+                : "font-normal"
+            )}
+            style={{ 
+              color: pathname === '/about' 
+                ? 'var(--color-brand-primary)' 
+                : 'var(--color-text-on-dark)' 
+            }}
+          >
+            About
+          </Link>
+          
+          <span style={{ color: '#ffcc00' }}>
+            Hellos: {helloCount}
+          </span>
+        </nav>
+      </div>
+    </header>
   );
 };

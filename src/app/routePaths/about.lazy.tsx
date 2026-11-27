@@ -6,15 +6,23 @@ export const Route = createLazyFileRoute('/about')({
 
 function AboutPage() {
   return (
-    <div style={{ maxWidth: '600px', lineHeight: '1.6' }}>
-      <h2 style={{ color: '#333333' }}>About</h2>
-      <p>
+    <div className="max-w-2xl leading-relaxed">
+      <h2 className="text-heading mb-4">About</h2>
+      <p className="text-body">
         This little app says hello in a few languages. It was written in 2019 and has not been touched
         since.
       </p>
-      <p style={{ background: '#fff3cd', padding: '10px', border: '1px solid #ffe08a' }}>
-        Tip: pick a greeting on the home page to make it your favourite.
-      </p>
+      <div 
+        className="p-4 rounded border mt-4"
+        style={{ 
+          background: '#fff3cd', 
+          borderColor: '#ffe08a' 
+        }}
+      >
+        <p className="text-body m-0">
+          <strong>Tip:</strong> pick a greeting on the home page to make it your favourite.
+        </p>
+      </div>
     </div>
   );
 }

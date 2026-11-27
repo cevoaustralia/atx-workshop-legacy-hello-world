@@ -3,6 +3,7 @@ import { useGetGreetingsQuery } from '@/app/api/queries/useGetGreetingsQuery';
 import { selectGreetingById } from '@/app/api/selectors/greetingSelectors';
 import { GreetingCard } from '@/app/components/molecule/GreetingCard';
 import { useFavouriteGreetingId, useSetFavouriteGreetingId } from '@/app/stores/greetingsStore';
+import { Button } from '@/design-system/components';
 
 export const Route = createLazyFileRoute('/greetings/$id')({
   component: GreetingPage,
@@ -15,7 +16,7 @@ function GreetingPage() {
   const setFavouriteGreetingId = useSetFavouriteGreetingId();
 
   if (isLoading) return <div className="loading">Loading...</div>;
-  if (error) return <div style={{ color: 'red' }}>Something went wrong: {String(error)}</div>;
+  if (error) return <div style={{ color: 'var(--color-text-muted)' }}>Something went wrong: {String(error)}</div>;
   if (!greetings) return <div>No greetings found</div>;
 
   const greeting = selectGreetingById(greetings, id);
@@ -24,7 +25,14 @@ function GreetingPage() {
     return (
       <div>
         <p>No greeting with id {id}.</p>
-        <Link to="/" search={undefined}>Back</Link>
+        <Link 
+          to="/" 
+          search={undefined}
+          className="no-underline hover:opacity-80"
+          style={{ color: 'var(--color-brand-primary)' }}
+        >
+          Back
+        </Link>
       </div>
     );
   }
@@ -32,20 +40,26 @@ function GreetingPage() {
   const isFavourite = favouriteGreetingId === greeting.id;
 
   return (
-    <div style={{ maxWidth: '480px' }}>
-      <Link to="/" search={undefined} style={{ color: '#ff6600' }}>
+    <div className="max-w-lg">
+      <Link 
+        to="/" 
+        search={undefined}
+        className="no-underline hover:opacity-80"
+        style={{ color: 'var(--color-brand-primary)' }}
+      >
         ← All greetings
       </Link>
-      <div style={{ marginTop: '16px' }}>
+      
+      <div className="mt-4">
         <GreetingCard greeting={greeting} favourite={isFavourite} showNote />
       </div>
-      <button
-        className="btn"
-        style={{ marginTop: '16px' }}
+      
+      <Button
+        className="mt-4"
         onClick={() => setFavouriteGreetingId(isFavourite ? null : greeting.id)}
       >
         {isFavourite ? 'Remove favourite' : 'Make favourite'}
-      </button>
+      </Button>
     </div>
   );
 }

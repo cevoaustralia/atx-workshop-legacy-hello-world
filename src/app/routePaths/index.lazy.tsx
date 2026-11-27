@@ -4,6 +4,7 @@ import { useGetGreetingsQuery } from '@/app/api/queries/useGetGreetingsQuery';
 import { selectGreetingsByLanguage } from '@/app/api/selectors/greetingSelectors';
 import { GreetingCard } from '@/app/components/molecule/GreetingCard';
 import { useIncrementHelloCount, useFavouriteGreetingId } from '@/app/stores/greetingsStore';
+import { Button } from '@/design-system/components';
 
 export const Route = createLazyFileRoute('/')({
   component: HomePage,
@@ -22,25 +23,29 @@ function HomePage() {
   };
 
   if (isLoading) return <div className="loading">Loading...</div>;
-  if (error) return <div style={{ color: 'red' }}>Something went wrong: {String(error)}</div>;
+  if (error) return <div style={{ color: 'var(--color-text-muted)' }}>Something went wrong: {String(error)}</div>;
   if (!greetings) return <div>No greetings found</div>;
 
   const shown = selectGreetingsByLanguage(greetings, lang);
 
   return (
     <div>
-      <h1 style={{ fontSize: '40px', color: '#333333', marginBottom: '4px' }}>Hello, World!</h1>
-      <p style={{ color: '#777777', marginTop: 0 }}>Say hello in {greetings.length} languages.</p>
+      <h1 className="text-5xl font-bold mb-1" style={{ color: 'var(--color-text-primary)' }}>
+        Hello, World!
+      </h1>
+      <p className="text-body mt-0">
+        Say hello in {greetings.length} languages.
+      </p>
 
-      <div style={{ margin: '20px 0' }}>
-        <label htmlFor="lang" style={{ marginRight: '8px' }}>
+      <div className="flex items-center gap-3 my-5">
+        <label htmlFor="lang" className="text-body">
           Language:
         </label>
         <select
           id="lang"
           value={lang}
           onChange={changeLang}
-          style={{ padding: '6px', fontSize: '14px' }}
+          className="px-2 py-1.5 text-sm rounded border border-gray-300"
         >
           <option value="all">All</option>
           {greetings.map((g) => (
@@ -49,9 +54,9 @@ function HomePage() {
             </option>
           ))}
         </select>
-        <button className="btn" style={{ marginLeft: '12px' }} onClick={incrementHelloCount}>
+        <Button onClick={incrementHelloCount}>
           Say hello
-        </button>
+        </Button>
       </div>
 
       <div className="grid">
